@@ -115,7 +115,7 @@ int Graph::CountDistance(int vertexNumber1, int vertexNumber2)
         }
         q.pop();
 
-        for (int i = 0; i < size; i++)
+        for (int i = 0; i < size; i++)//погсещаю всех непосещ сосед
         {
             if (!visited[i] && adjacencyMatrix[currentVertexNumber - 1][i] == 1) //if neighbour is not visited
             {
@@ -125,7 +125,7 @@ int Graph::CountDistance(int vertexNumber1, int vertexNumber2)
             }
         }
     }
-    // if we haven't exited the function yet this means that given vertices belong to different connected components
+    // if we haven't exited the function yet this means that given vertixes belong to different connected components
     cout << "Can not count distance(graph is not connected)" << endl;
     delete[] visited;
     delete[] distance;
@@ -158,7 +158,7 @@ void DemonstrationFunction()
     cout << "Input vertex 2 number: " << endl;
     cin >> vertexNumber2;
     int distance = graph->CountDistance(vertexNumber1, vertexNumber2);
-    cout << "Distance between verices " << vertexNumber1 << " and " << vertexNumber2 << " is: " << distance << endl;
+    cout << "Distance between vertices " << vertexNumber1 << " and " << vertexNumber2 << " is: " << distance << endl;
     graph->~Graph();
 }
 
