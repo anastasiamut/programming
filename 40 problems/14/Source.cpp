@@ -1,337 +1,166 @@
-////Реализовать работу динамической структуры: ОЧЕРЕДЬ
-//Добавление элемента·Удаление·Сортировка : В работе использовать два метода
-//сортировки : быструю и вставками.Сравнить эффективность.
+/// Написать программу, которая осуществляет пирамидальную сортировку массива
+//с использованием рекурсии.
 
 
 #include "pch.h"
 #include <iostream>
+#include <vector>
 #include <ctime>
 #include <cstdlib>
-#include <cmath>
 
 using namespace std;
 
-struct Node
+class Heap
 {
-	int data;
-	Node* next;
-	Node* prev;
+private:
+	int heapSize;
+	vector<int> heapVector;
+	void maxHeapify(int index);
+	void swap(int* a, int* b)
+	{
+		int c = *a;
+		*a = *b;
+		*b = c;
+	}
+
+public:
+	Heap(vector<int> newVector)//
+	{
+		heapVector = newVector;
+		heapSize = newVector.size();
+		for (int i=(heapSize - 2) / 2; i >= 0; i--)//для всех не листков справа налево делаем норм пирам
+		{
+			maxHeapify(i);
+		}
+	}
+	Heap(int* newArray)
+	{
+		heapSize = sizeof(newArray) / sizeof(int);
+		for (int i(0); i < heapSize; i++)
+		{
+			heapVector.push_back(newArray[i]);
+		}
+		for (int i=(heapSize - 2) / 2; i >= 0; i--)
+		{
+			maxHeapify(i);
+		}
+	}
+	void heapSort();
+	void printVector();
 };
 
-struct Queue
-{
-	int Size;
-	Node* Head;
-	Node* Tail;
-};
+void Heap::maxHeapify(int parent)//возобновление свойства пирамиды проверяем батю и 2х сынов и максимум меняем с батей
 
-Queue* CreateEmpty()
 {
-	Queue* result = new Queue;
-	result->Head = NULL;
-	result->Tail = NULL;
-	result->Size = 0;
-	return result;
-}
+	int max = parent;
+	int leftChild = 2 * parent + 1;
+	int rightChild = 2 * parent + 2;
 
-
-void Push(Queue* someQueue, int data)
-{
-	Node* toPush = new Node;
-	toPush->data = data;
-	toPush->prev = NULL;
-	if (someQueue->Size > 0) 
+	if (leftChild < heapSize && heapVector[leftChild] > heapVector[max])
 	{
-		someQueue->Tail->prev = toPush;
-		toPush->next = someQueue->Tail;
+		max = leftChild;
 	}
-	else
+
+	if (rightChild < heapSize && heapVector[rightChild] > heapVector[max])
 	{
-		toPush->next = NULL;
-		someQueue->Head = toPush;
+		max = rightChild;
 	}
-	someQueue->Tail = toPush;
-	someQueue->Size++;
-}
 
-Queue* CreateRandomQueue(int length)
-{
-	Queue* result = CreateEmpty();
-	for (int i = 0; i < length; i++)
+	// change root, put max into the root
+	if (max != parent)//меняем батю и макс запускаем для бати который стал сыном
 	{
-		Push(result, rand() % 100);
-	}
-	return result;
-}
-
-
-
-Node* Remove(Queue* someQueue)
-{
-	if (someQueue->Size > 0)
-	{
-		Node* toRemove = someQueue->Head;
-		someQueue->Head = someQueue->Head->prev;
-		someQueue->Head->next = NULL;
-		toRemove->prev = NULL;
-		someQueue->Size--;
-		delete toRemove;
-	}
-	else
-	{
-		return NULL;
+		swap(&heapVector[max], &heapVector[parent]);
+		maxHeapify(max);
 	}
 }
 
+void Heap::heapSort()
+{
+	while (heapSize > 1)//меняем1 с ласт и отрезаем
+	{
+		swap(&heapVector[0], &heapVector[heapSize - 1]);
+		heapSize--;
+		maxHeapify(0);//возобновляем пирамиду для нового корня
+	}
+}
 
+void Heap::printVector()
+{
+	cout << "<";
+	for (int i(0); i < heapVector.size(); i++)
+	{
+		cout << heapVector[i];
+		if (i == heapVector.size()-1)
+		{
+			cout << "";
+		}
+		else 
+		{
+			cout<< ", ";
+		}
+
+	}
+
+	cout << ">";
+	cout << endl;
+}
 
 int enterLength()
 {
-	int l;
-	cout << "Enter the length of your queue: ";
+	int l = 0;
+	cout << "Enter your vector's length: ";
 	do
 	{
-
 		cin >> l;
-		if (l <= 0)
+		if (l < 0)
 		{
 			cout << "It should be positive, try again: ";
+		}
+		else if (l == 0)
+		{
+			cout << "There's nothing to create,try again: ";
 		}
 	} while (l <= 0);
-
 	return l;
-}
-
-int enterNumberofElementsToDelete(int length)
-{
-	cout << "How many elements do you want to remove from the queue?: ";
-	int n;
-	do
-	{
-		cin >> n;
-		if (n < 0)
-		{
-			cout << "It should be positive, try again: ";
-		}
-		else if(n>=length)
-		{
-			cout << "It shouldn't be greater than length, try again.";
-		}
-		else if (n == 0)
-		{
-			cout << "There is nothing to delete. " << endl;
-			return 0;
-		}
-	} while (n <= 0 || n >= length);
-	return n;
-}
-
-int enterNumberOfElementsToAdd()
-{
-	cout << "How many elements do you want to add to the queue?: ";
-	int n;
-	do
-	{
-		cin >> n;
-		if (n < 0)
-		{
-			cout << "It should be positive, try again: ";
-		}
-		if (n == 0)
-		{
-			cout << "There is nothing to add. " << endl;
-			return 0;
-		}
-	} while (n <= 0);
-	return n;
-}
-
-
-
-
-void ShowQueue(Queue* queueToShow)
-{
-	cout << "[";
-	Node* current = queueToShow->Tail;
-	while (current)
-	{
-		cout << current->data;
-		if (current->next != NULL)
-		{
-			cout << ", ";
-		}
-		current = current->next;
-	}
-	cout << "]" << endl;
-}
-
-
-void InsertionSort(Queue* queueToSort)//двигает вправо пока справа от него элемент больше
-{
-	Node* current = queueToSort->Head;
-	while (current)// проходится по элементам справа налево
-	{
-		Node* innerCurrent = current;
-		while (innerCurrent->next && innerCurrent->data > innerCurrent->next->data) // каждый элемент сдвигает вправо пока надо
-		{
-			swap(innerCurrent->data, innerCurrent->next->data);
-			innerCurrent = innerCurrent->next;
-		}
-		current = current->prev;
-	}
-}
-
-Node* At(Queue* someQueue, int number)//получить элемент под номером, нумерация с нуля
-{
-	Node* result = someQueue->Tail;
-	int counter = 0;
-	while (counter < number)
-	{
-		counter++;
-		result = result->next;
-	}
-	return result;
-}
-
-void QuickSort(Queue* queueToSort, int low, int high)//слева от опорного меньше справа больше
-{
-	int l = low;//границы в которыхт сортируем
-	int h = high;
-	Node* currentLow = At(queueToSort, l);//под номером л
-	Node* currentHigh = At(queueToSort, h);
-	int pivot = At(queueToSort, (low + high) / 2)->data;//опорный эл-центральный
-	do// после завершения цикла на место поставится опорный 
-	{
-		while (currentLow->data < pivot)//двигаем л вправо пока элементы меньше чем опорный
-		{
-			l++;//когда находим не на своем месте останавливаемся
-			currentLow = currentLow->next;
-			if (l == high)
-			{
-				break;
-			}
-		}
-		while (currentHigh->data > pivot)
-		{
-			h--;
-			currentHigh = currentHigh->prev;
-			if (h == low)
-			{
-				break;
-			}
-		}
-		if (l <= h)
-		{
-			swap(currentHigh->data, currentLow->data);
-			l++;
-			currentLow = currentLow->next;
-			h--;
-			currentHigh = currentHigh->prev;
-		}
-	} while (l < h);
-	if (low < h)//
-	{
-		QuickSort(queueToSort, low, h);
-	}
-	if (l < high)
-	{
-		QuickSort(queueToSort, l, high);
-	}
-
-}
-
-Queue* copyQueue(Queue* queueToCopy)
-{
-	Queue* newQueue = CreateEmpty();
-	Node* current = queueToCopy->Head;
-	for (int i = 0; i < queueToCopy->Size; i++)
-	{
-		Push(newQueue, current->data);
-		current = current->prev;
-	}
-	return newQueue;
-}
-
-void CompareEfficiency()
-{
-	Queue* veryLongQueue = CreateRandomQueue(10000);
-	Queue* veryLongQueue2 = copyQueue(veryLongQueue);
-	/*ShowQueue(veryLongQueue);
-	ShowQueue(veryLongQueue2);*/
-	clock_t startTime = clock();
-	InsertionSort(veryLongQueue);
-	//ShowQueue(veryLongQueue2);
-	clock_t endTime = clock();
-	double deltaTime = double(endTime - startTime) / CLOCKS_PER_SEC;
-	cout << "Time of InsertionSort: " << deltaTime << endl;
-	startTime = clock();
-	QuickSort(veryLongQueue2, 0, veryLongQueue2->Size - 1);
-	//ShowQueue(veryLongQueue);
-	endTime = clock();
-	deltaTime = double(endTime - startTime) / CLOCKS_PER_SEC;
-	cout << "Time of QuickSort: " << deltaTime << endl;
-}
-
-
-
-
-
-
-void TestFunction()
-{
-	int length = enterLength();
-	Queue* randomQueue = CreateRandomQueue(length);
-	cout << "Here is your randomly generated queue: ";
-	ShowQueue(randomQueue);
-	cout << endl << "*********************************************************************************************" << endl << endl;
-
-
-	int n = enterNumberofElementsToDelete(length);
-	for (int i = 0; i < n; i++)
-	{
-		Remove(randomQueue);
-	}
-	if (n != 0)
-	{
-		cout << "Here is your queue now: ";
-		ShowQueue(randomQueue);
-	}
-	cout << endl << "*********************************************************************************************" << endl << endl;
-
-	int n2 = enterNumberOfElementsToAdd();
-
-	if (n2 != 0)
-	{
-		cout << "Enter the element (s) you want to add: ";
-		for (int i = 0; i < n2; i++)
-		{
-			int element;
-			cin >> element;
-			Push(randomQueue, element);
-		}
-		cout << "Here is you queue now: ";
-		ShowQueue(randomQueue);
-	}
-	cout << endl << "*********************************************************************************************" << endl << endl;
-
-
-	cout << "Here is the qeue after the insertion sort: ";
-	InsertionSort(randomQueue);
-	ShowQueue(randomQueue);
-	cout << endl << "*********************************************************************************************" << endl << endl;
-
-	cout << "Here is the queue after the quick sort: ";
-	QuickSort(randomQueue, 0, randomQueue->Size - 1);
-	ShowQueue(randomQueue);
-	cout << endl << "*********************************************************************************************" << endl << endl;
-
-
-	cout << "Comparing their efficiency: " << endl << endl;
-	CompareEfficiency();
 }
 
 int main()
 {
-	srand(time(0));
-	TestFunction();
+	srand(time(NULL));
+	vector<int> newVector1;
+	int l = enterLength();
+	cout << endl;
+	cout << "************************************************" << endl << endl;
+	if (l > 0)
+	{
+		cout << "Your randomly generated vector is: " << endl;
+	}
+	cout << "<";
+	for (int i(0); i < l; i++)
+	{
+		newVector1.push_back(rand() % 100 + 1);
+		cout << newVector1[i];
+		if (i == l - 1)
+		{
+			cout << "";
+		}
+		else
+		{
+			cout << ", ";
+		}
+	}
+	cout << ">";
+	cout << endl << endl;
+	cout << "************************************************" << endl << endl;
+
+
+	Heap heap1(newVector1);
+	cout << "Turning it into heap: " << endl;
+	heap1.printVector();
+	heap1.heapSort();
+	cout <<endl<< "************************************************" << endl << endl;
+
+
+	cout << "Sorted vector (using the HeapSort) : " << endl;
+	heap1.printVector();
 }
