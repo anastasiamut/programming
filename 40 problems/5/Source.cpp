@@ -1,4 +1,4 @@
-﻿/*Создать односвязный линейный список (у каждого узла 1 информ. поле типа
+/*Создать односвязный линейный список (у каждого узла 1 информ. поле типа
 Integer), с возможностью добавлять и удалять узлы.
 После завершения редактирования списка запросить число N и разбить список на
 два других, не меняя расположения элементов в памяти, следующим образом:
@@ -63,7 +63,7 @@ void AddNode(List* list, Node* nodeToAdd)
 double enterNumber()
 {
 	double number;
-	cout << "Enter the number you want to insert: ";
+	cout << "Enter the element you want to insert: ";
 	cin >> number;
 	return number;
 }
@@ -76,12 +76,16 @@ int enterNumber1(int length)
 	do
 	{
 		cin >> n;
-		if (n <= 0|| n>length)
+		if (n <= 0)
 		{
-			cout << "It should be positive and not grater than the list's length, try again: " << endl;
+			cout << "It should be positive, try again: " << endl;
+		}
+		else if (n > length+1)
+		{
+			cout << "It shouldn't be that greater than length, try again: ";
 		}
 
-	} while (n <= 0||n>length);
+	} while (n <= 0||n>length+1);
 	return n;
 }
 
@@ -92,9 +96,13 @@ int enterNumber2(int length)
 	do
 	{
 		cin >> n;
-		if (n <= 0||n>length)
+		if (n <= 0)
 		{
-			cout << "It should be positive and not grater than the list's length, try again: " << endl;
+			cout << "It should be positive, try again: " << endl;
+		}
+		else if (n > length)
+		{
+			cout << "It shouldn't be greater than length, try again: ";
 		}
 
 	} while (n <= 0||n>length);
@@ -103,7 +111,7 @@ int enterNumber2(int length)
 
 void insertNode(List* list, Node* nodeToAdd)
 {
-	double n = enterNumber1(list->length);
+	int n = enterNumber1(list->length);
 	if ((list->length == 0)&&(n==1))
 	{
 		list->Begin = nodeToAdd;
@@ -122,7 +130,7 @@ void insertNode(List* list, Node* nodeToAdd)
 	else
 	{
 		Node* current = list->Begin;
-		for (int i = 0; i < n-2; i++)
+		for (int i = 1; i < n-1; i++)
 		{
 			current = current->next;
 		}
@@ -162,9 +170,13 @@ int enterLength()
 	{
 		cin >> l;
 		cout << endl;
-		if (l <= 0)
+		if (l < 0)
 		{
 			cout << "It should be positive, try again: ";
+		}
+		else if (l == 0)
+		{
+			cout << "There is nothing to create, try again: ";
 		}
 		
 	} while (l <= 0);
@@ -177,7 +189,7 @@ List* CreateRandomList()
 	int l = enterLength();
 	for (int i = 0; i < l; i++)
 	{
-		double data = (double(rand()) / RAND_MAX)*200-100;
+		double data = rand()%100;
 		AddData(result, data);
 	}
 	return result;
@@ -206,7 +218,7 @@ void deleteViaNumber(List* list)
 	else
 	{
 		Node* current = list->Begin;
-		for (int i = 0; i < numberToDelete - 2; i++)
+		for (int i = 1; i < numberToDelete - 1; i++)
 		{
 			current = current->next;
 		}
@@ -228,31 +240,6 @@ void deleteViaNumber(List* list)
 	delete nodeToDelete;
 }
 
-void DeleteNode(List* list, Node* toDelete)
-{
-	Node* current = list->Begin;
-	if (list->Begin == toDelete)
-	{
-		list->Begin = list->Begin->next;
-	}
-	while (current->next != toDelete)
-	{
-		current = current->next;
-	}
-
-	if (toDelete->next)
-	{
-		current->next = toDelete->next;
-	}
-	else
-	{
-		list->End = current;
-		current->next = NULL;
-	}
-	list->length--;
-	delete toDelete;
-
-}
 
 void DeleteList(List* listToDelete)
 {
@@ -327,13 +314,6 @@ void SolveTask()
 	ShowList(randomList);
 	cout << endl << "**************************************************" << endl << endl;
 
-	//cout << "Adding number 100 to the end of the list: " << endl;
-	//AddData(randomList, 100);
-	//ShowList(randomList);
-
-	/*cout << "Removing last element: " << endl;
-	DeleteNode(randomList, randomList->End);
-	ShowList(randomList);*/
 
 	cout << "Dividing list into 2 sublists: " << endl;
 	DivideListInto2Sublists(randomList);
