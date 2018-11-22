@@ -1,4 +1,4 @@
-﻿////Реализовать работу динамической структуры: ОЧЕРЕДЬ
+////Реализовать работу динамической структуры: ОЧЕРЕДЬ
 //Добавление элемента·Удаление·Сортировка : В работе использовать два метода
 //сортировки : быструю и вставками.Сравнить эффективность.
 
@@ -88,9 +88,10 @@ Node* Remove(Queue* someQueue)
 int enterLength()
 {
 	int l;
+	cout << "Enter the length of your queue: ";
 	do
 	{
-		cout << "Enter the length of your qeue: ";
+
 		cin >> l;
 		if (l <= 0)
 		{
@@ -103,14 +104,23 @@ int enterLength()
 
 int enterNumberofElementsToDelete(int length)
 {
-	cout << "How many elements do you want to remove from the qeue?: ";
+	cout << "How many elements do you want to remove from the queue?: ";
 	int n;
 	do
 	{
 		cin >> n;
-		if (n <= 0 || n >= length)
+		if (n < 0)
 		{
-			cout << "It should be positive and greater than length, try again: ";
+			cout << "It should be positive, try again: ";
+		}
+		else if(n>=length)
+		{
+			cout << "It shouldn't be greater than length, try again.";
+		}
+		else if (n == 0)
+		{
+			cout << "There is nothing to delete. " << endl;
+			return 0;
 		}
 	} while (n <= 0 || n >= length);
 	return n;
@@ -118,14 +128,19 @@ int enterNumberofElementsToDelete(int length)
 
 int enterNumberOfElementsToAdd()
 {
-	cout << "How many elements do you want to add to the qeue?: ";
+	cout << "How many elements do you want to add to the queue?: ";
 	int n;
 	do
 	{
 		cin >> n;
-		if (n <= 0)
+		if (n < 0)
 		{
 			cout << "It should be positive, try again: ";
+		}
+		if (n == 0)
+		{
+			cout << "There is nothing to add. " << endl;
+			return 0;
 		}
 	} while (n <= 0);
 	return n;
@@ -225,17 +240,33 @@ void QuickSort(Queue* queueToSort, int low, int high)//слева от опор�
 
 }
 
+Queue* copyQueue(Queue* queueToCopy)
+{
+	Queue* newQueue = CreateEmpty();
+	Node* current = queueToCopy->Head;
+	for (int i = 0; i < queueToCopy->Size; i++)
+	{
+		Push(newQueue, current->data);
+		current = current->prev;
+	}
+	return newQueue;
+}
+
 void CompareEfficiency()
 {
 	Queue* veryLongQueue = CreateRandomQueue(10000);
+	Queue* veryLongQueue2 = copyQueue(veryLongQueue);
+	/*ShowQueue(veryLongQueue);
+	ShowQueue(veryLongQueue2);*/
 	clock_t startTime = clock();
 	InsertionSort(veryLongQueue);
+	//ShowQueue(veryLongQueue2);
 	clock_t endTime = clock();
 	double deltaTime = double(endTime - startTime) / CLOCKS_PER_SEC;
 	cout << "Time of InsertionSort: " << deltaTime << endl;
-	veryLongQueue = CreateRandomQueue(10000);
 	startTime = clock();
-	QuickSort(veryLongQueue, 0, veryLongQueue->Size - 1);
+	QuickSort(veryLongQueue2, 0, veryLongQueue2->Size - 1);
+	//ShowQueue(veryLongQueue);
 	endTime = clock();
 	deltaTime = double(endTime - startTime) / CLOCKS_PER_SEC;
 	cout << "Time of QuickSort: " << deltaTime << endl;
@@ -244,11 +275,13 @@ void CompareEfficiency()
 
 
 
+
+
 void TestFunction()
 {
 	int length = enterLength();
 	Queue* randomQueue = CreateRandomQueue(length);
-	cout << "Here is your randomly generated qeue: ";
+	cout << "Here is your randomly generated queue: ";
 	ShowQueue(randomQueue);
 	cout << endl << "*********************************************************************************************" << endl << endl;
 
@@ -258,20 +291,27 @@ void TestFunction()
 	{
 		Remove(randomQueue);
 	}
-	cout << "Here is your qeue now: ";
-	ShowQueue(randomQueue);
+	if (n != 0)
+	{
+		cout << "Here is your queue now: ";
+		ShowQueue(randomQueue);
+	}
 	cout << endl << "*********************************************************************************************" << endl << endl;
 
 	int n2 = enterNumberOfElementsToAdd();
-	cout << "Enter the element (s) you want to add: ";
-	for (int i = 0; i < n2; i++)
+
+	if (n2 != 0)
 	{
-		int element;
-		cin >> element;
-		Push(randomQueue, element);
+		cout << "Enter the element (s) you want to add: ";
+		for (int i = 0; i < n2; i++)
+		{
+			int element;
+			cin >> element;
+			Push(randomQueue, element);
+		}
+		cout << "Here is you queue now: ";
+		ShowQueue(randomQueue);
 	}
-	cout << "Here is you qeue now: ";
-	ShowQueue(randomQueue);
 	cout << endl << "*********************************************************************************************" << endl << endl;
 
 
@@ -280,7 +320,7 @@ void TestFunction()
 	ShowQueue(randomQueue);
 	cout << endl << "*********************************************************************************************" << endl << endl;
 
-	cout << "Here is the qeue after the quick sort: ";
+	cout << "Here is the queue after the quick sort: ";
 	QuickSort(randomQueue, 0, randomQueue->Size - 1);
 	ShowQueue(randomQueue);
 	cout << endl << "*********************************************************************************************" << endl << endl;
